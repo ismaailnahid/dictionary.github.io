@@ -1,0 +1,2614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gboard Dictionary Editor Pro</title>
+
+    <style>
+        /* ======================================== */
+        /* 1. ROOT VARIABLES (Light & Dark Theme)   */
+        /* ======================================== */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #ffffff73;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #ff2600;
+            --border: #e2e8f0;
+            --radius: 10px;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --toast-bg: #1e293b;
+            --toast-color: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg: #070b14;
+            --card: rgba(18, 25, 45, 0.85);
+            --card-glass: rgba(18, 25, 45, 0.65);
+            --card-hover: rgba(25, 35, 60, 0.95);
+            --text: #edf2ff;
+            --text-muted: #8e9ecc;
+            --border: rgba(59, 130, 246, 0.2);
+            --border-glow: rgba(59, 130, 246, 0.4);
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(59, 130, 246, 0.3);
+            --input-bg: #0a1020;
+            --input-text: #e8f0fe;
+            --input-border: #1e2a4a;
+            --placeholder: #4a5a8a;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --secondary: #c084fc;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --glass-blur: blur(10px);
+        }
+
+        /* ======================================== */
+        /* 2. GLOBAL RESET & BASE STYLES           */
+        /* ======================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            overflow: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 12px 8px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        /* ======================================== */
+        /* 3. CONTAINER & LAYOUT                   */
+        /* ======================================== */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #editor-tab.active {
+            display: flex !important;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .editor-left-column,
+        .editor-right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .full-width-section {
+            width: 100%;
+        }
+
+        /* ======================================== */
+        /* 4. HEADER & TYPOGRAPHY                  */
+        /* ======================================== */
+        .header {
+            text-align: center;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: clamp(1.4rem, 5vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: clamp(0.75rem, 3vw, 1.1rem);
+        }
+
+        /* ======================================== */
+        /* 5. PROGRESS BAR                         */
+        /* ======================================== */
+        .progress-container {
+            margin: 12px 0;
+        }
+
+        .progress-bar {
+            max-width: 80%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        /* ======================================== */
+        /* 6. FORM ELEMENTS (Input, Textarea, Select) */
+        /* ======================================== */
+        input,
+        textarea,
+        button,
+        select {
+            font-family: inherit;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-size: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+            box-sizing: border-box;
+            line-height: 1.4;
+            min-height: 40px;
+        }
+
+        textarea {
+            min-height: 120px;
+            max-height: 300px;
+            resize: vertical;
+            line-height: 1.5;
+            padding: 10px 12px;
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+            transform: none;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ======================================== */
+        /* 7. BUTTON STYLES                        */
+        /* ======================================== */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+            font-size: 0.85rem;
+            justify-content: center;
+            width: auto;
+            min-width: fit-content;
+            height: auto;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-secondary {
+            background: var(--text-muted);
+        }
+
+        /* ======================================== */
+        /* 8. ACTIONS GRID                         */
+        /* ======================================== */
+        .actions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .actions-grid .btn {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        /* ======================================== */
+        /* 9. INPUT GROUPS & FIELD LABELS          */
+        /* ======================================== */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0 2px;
+        }
+
+        .input-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.8rem;
+        }
+
+        /* ======================================== */
+        /* 10. ADVANCED FILTERS                    */
+        /* ======================================== */
+        .advanced-filters {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.75rem;
+        }
+
+        /* ======================================== */
+        /* 11. PREVIEW SECTION                     */
+        /* ======================================== */
+        #preview {
+            height: 350px;
+            overflow: auto;
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #preview div {
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        #preview .shortcut {
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 100px;
+        }
+
+        #preview .value {
+            color: #0da271;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        #preview div:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        #preview .highlight {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--warning);
+        }
+
+        #preview .selected {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.1));
+            border-left-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        #preview .new-entry {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--success);
+        }
+
+        #preview .edited-entry {
+            background: rgba(255, 0, 0, 0.1);
+            border-left-color: var(--danger);
+        }
+
+        #preview .exact-match {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
+            border-left: 3px solid var(--success);
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.01);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ======================================== */
+        /* 12. EDIT CONTROLS                       */
+        /* ======================================== */
+        .edit-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        /* ======================================== */
+        /* 13. ALPHABET BAR                        */
+        /* ======================================== */
+        #alphabetBar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin: 12px 0;
+            padding: 12px 8px;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        #alphabetBar span {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 20px;
+            min-width: 34px;
+            text-align: center;
+        }
+
+        #alphabetBar span:active {
+            background: var(--primary);
+            color: white;
+            transform: scale(0.95);
+        }
+
+        /* ======================================== */
+        /* 14. STATS & TOAST                       */
+        /* ======================================== */
+        #stats {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--toast-bg);
+            color: var(--toast-color);
+            padding: 12px 18px;
+            border-radius: 30px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 0.8rem;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* ======================================== */
+        /* 15. FAB (Floating Action Button)        */
+        /* ======================================== */
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .fab {
+            width: 52px;
+            height: 52px;
+            border-radius: 26px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab-actions {
+            position: absolute;
+            bottom: 65px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fab-actions.show {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fab-action {
+            width: auto;
+            min-width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .fab-action:active {
+            transform: scale(0.92);
+        }
+
+        .fab-action[onclick*="toggleSection"] {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .fab-action[onclick="quickExport()"] {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .fab-action[onclick="resetAllSections()"] {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        /* ======================================== */
+        /* 16. SETTINGS MODAL                      */
+        /* ======================================== */
+        .settings-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 998;
+        }
+
+        .settings-btn:active {
+            transform: scale(0.95);
+        }
+
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .settings-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .settings-content {
+            background: var(--card);
+            border-radius: 24px;
+            width: 92%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .settings-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 8px;
+        }
+
+        .settings-section {
+            margin-bottom: 20px;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .settings-section h4 {
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        /* ======================================== */
+        /* 17. FILE UPLOAD                         */
+        /* ======================================== */
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 4px;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        /* ======================================== */
+        /* 18. SECTION HIDE UTILITY                */
+        /* ======================================== */
+        .section-hidden {
+            display: none !important;
+        }
+
+        /* ======================================== */
+        /* 19. TOGGLE SWITCH                       */
+        /* ======================================== */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: var(--primary);
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        [data-theme="dark"] .toggle-slider {
+            background-color: #475569;
+        }
+
+        /* ======================================== */
+        /* 20. RESPONSIVE BREAKPOINTS              */
+        /* ======================================== */
+
+        /* 280px - Galaxy Fold */
+        @media (max-width: 280px) {
+
+            textarea,
+            input,
+            select {
+                padding: 5px 8px;
+                min-height: 32px;
+                font-size: 12px;
+            }
+
+            textarea {
+                min-height: 80px;
+            }
+
+            .input-field label {
+                font-size: 0.65rem;
+            }
+
+            #alphabetBar span {
+                padding: 3px 5px;
+                min-width: 26px;
+                font-size: 9px;
+            }
+
+            .btn {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+            }
+        }
+
+        /* 400px - Small Mobile */
+        @media (max-width: 400px) {
+
+            textarea,
+            input,
+            select {
+                padding: 5px 8px;
+                min-height: 34px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            textarea {
+                min-height: 90px;
+                padding: 8px 10px;
+            }
+
+            .input-field label {
+                font-size: 0.7rem;
+                margin-bottom: 3px;
+            }
+
+            .actions-grid .btn {
+                font-size: 0.65rem;
+                padding: 4px 7px;
+            }
+
+            .fab-action {
+                min-width: 38px;
+                height: 38px;
+                font-size: 14px;
+                padding: 0 8px;
+            }
+
+            .fab {
+                width: 46px;
+                height: 46px;
+                font-size: 18px;
+            }
+
+            #alphabetBar span {
+                padding: 4px 6px;
+                min-width: 28px;
+                font-size: 10px;
+            }
+        }
+
+        /* 480px - Mobile */
+        @media (max-width: 480px) {
+
+            textarea,
+            input,
+            select {
+                padding: 6px 10px;
+                min-height: 36px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            textarea {
+                min-height: 100px;
+                padding: 8px 10px;
+            }
+
+            .input-group {
+                gap: 8px;
+            }
+
+            .input-field label {
+                margin-bottom: 3px;
+                font-size: 0.75rem;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+                border-radius: 8px;
+            }
+
+            .actions-grid {
+                gap: 6px;
+            }
+
+            .actions-grid .btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+                border-radius: 7px;
+            }
+
+            .file-upload .btn,
+            #newEntryCard .input-group .btn {
+                width: fit-content;
+                justify-content: center;
+            }
+
+            #newEntryCard .input-group {
+                flex-direction: column;
+            }
+
+            .edit-controls {
+                gap: 8px;
+            }
+
+            #toast {
+                white-space: normal;
+                max-width: 85%;
+                bottom: 75px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+            }
+
+            .settings-content {
+                padding: 16px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .input-group .btn {
+                width: 100%;
+            }
+
+            ::placeholder {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 500px - Button Layout */
+        @media (min-width: 500px) {
+            .input-group {
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 12px;
+            }
+
+            .input-field {
+                flex: 1;
+            }
+
+            .input-group .btn {
+                flex: 0 0 auto;
+                min-width: fit-content;
+                width: auto;
+            }
+
+            .advanced-filters {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 16px;
+            }
+
+            #preview div {
+                flex-wrap: nowrap;
+                justify-content: space-between;
+            }
+
+            .edit-controls {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            #alphabetBar span {
+                font-size: 12px;
+                padding: 5px 10px;
+                border-radius: 22px;
+                min-width: 32px;
+            }
+        }
+
+        /* 600px - Tablet */
+        @media (min-width: 600px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .container {
+                padding: 20px 16px;
+                gap: 20px;
+            }
+
+            #editor-tab.active,
+            .editor-left-column,
+            .editor-right-column {
+                gap: 20px;
+            }
+
+            .progress-bar {
+                max-width: 60%;
+            }
+
+            .progress-text {
+                font-size: 0.8rem;
+            }
+
+            textarea,
+            input,
+            select {
+                padding: 10px 14px;
+                min-height: 44px;
+                border-radius: 10px;
+            }
+
+            textarea {
+                min-height: 150px;
+                padding: 12px 14px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                border-radius: 9px;
+            }
+
+            .actions-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .actions-grid .btn {
+                min-width: auto;
+                font-size: 0.85rem;
+                padding: 10px 12px;
+            }
+
+            #stats {
+                text-align: right;
+                font-size: 0.8rem;
+            }
+
+            .fab {
+                width: 56px;
+                height: 56px;
+                border-radius: 28px;
+                font-size: 22px;
+            }
+
+            .fab-action {
+                min-width: 46px;
+                height: 46px;
+                border-radius: 23px;
+                font-size: 18px;
+                padding: 0 14px;
+            }
+
+            .settings-btn {
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+        }
+
+        /* 768px - Large Tablet */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .container {
+                padding: 24px 20px;
+                gap: 24px;
+            }
+
+            #preview {
+                height: 400px;
+                padding: 14px;
+            }
+
+            .fab-action:hover {
+                transform: scale(1.1) translateY(-3px);
+            }
+
+            .fab-action:hover::after {
+                content: attr(title);
+                position: absolute;
+                right: 55px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--toast-bg);
+                color: var(--toast-color);
+                padding: 4px 10px;
+                border-radius: 8px;
+                font-size: 12px;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 1000;
+            }
+        }
+
+        /* 900px - Desktop */
+        @media (min-width: 900px) {
+            #editor-tab.active {
+                display: grid !important;
+                grid-template-columns: 1fr 1.5fr;
+                gap: 24px;
+            }
+
+            #editor-tab.active .full-width-section {
+                grid-column: 1 / -1;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            textarea,
+            input,
+            select {
+                padding: 12px 16px;
+                border-radius: 11px;
+            }
+        }
+
+        /* 1200px - Large Desktop */
+        @media (min-width: 1200px) {
+            body {
+                padding: 24px 20px;
+            }
+
+            .container {
+                padding: 30px;
+                gap: 28px;
+            }
+
+            #editor-tab.active {
+                gap: 28px;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .settings-content {
+                max-width: 550px;
+                padding: 24px;
+            }
+        }
+
+        /* ======================================== */
+        /* 21. DARK THEME OVERRIDES                */
+        /* ======================================== */
+        [data-theme="dark"] textarea,
+        [data-theme="dark"] input[type="text"],
+        [data-theme="dark"] input[type="password"],
+        [data-theme="dark"] select {
+            background: var(--input-bg);
+            color: var(--input-text);
+            border-color: var(--input-border);
+            padding: 8px 12px;
+            min-height: 40px;
+        }
+
+        [data-theme="dark"] textarea {
+            min-height: 120px;
+            padding: 10px 12px;
+        }
+
+        @media (max-width: 480px) {
+
+            [data-theme="dark"] textarea,
+            [data-theme="dark"] input {
+                padding: 6px 10px;
+                min-height: 36px;
+            }
+
+            [data-theme="dark"] textarea {
+                min-height: 100px;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            [data-theme="dark"] textarea,
+            [data-theme="dark"] input {
+                padding: 5px 8px;
+                min-height: 34px;
+            }
+
+            [data-theme="dark"] textarea {
+                min-height: 90px;
+            }
+        }
+
+        @media (min-width: 600px) {
+
+            [data-theme="dark"] textarea,
+            [data-theme="dark"] input {
+                padding: 10px 14px;
+                min-height: 44px;
+            }
+
+            [data-theme="dark"] textarea {
+                min-height: 150px;
+            }
+        }
+
+        [data-theme="dark"] textarea:focus,
+        [data-theme="dark"] input:focus,
+        [data-theme="dark"] select:focus {
+            background: var(--input-bg);
+            color: var(--input-text);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        [data-theme="dark"] textarea::placeholder,
+        [data-theme="dark"] input::placeholder {
+            color: var(--placeholder);
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] textarea {
+            color: var(--success);
+        }
+
+        [data-theme="dark"] .card {
+            background: var(--card-glass);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            padding: 4px;
+        }
+
+        [data-theme="dark"] .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .card:hover::before {
+            left: 100%;
+        }
+
+        [data-theme="dark"] .card:hover {
+            background: var(--card-hover);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="dark"] .card h3 {
+            color: var(--text);
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        [data-theme="dark"] .filter-group label,
+        [data-theme="dark"] .input-field label {
+            color: var(--text-muted);
+        }
+
+        [data-theme="dark"] .container {
+            background: var(--bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        [data-theme="dark"] .full-width-section {
+            background: var(--card);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 10px;
+        }
+
+        [data-theme="dark"] ::selection {
+            background: rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+
+        [data-theme="dark"] ::-moz-selection {
+            background: rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+
+        [data-theme="dark"] #preview {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+
+        [data-theme="dark"] #preview .selected {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.2));
+            border-left-color: #3b82f6;
+        }
+
+        [data-theme="dark"] #preview .shortcut {
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] #preview .value {
+            color: var(--success);
+        }
+
+        [data-theme="dark"] #preview .exact-match {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2));
+            border-left: 3px solid #34d399;
+        }
+
+        [data-theme="dark"] {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] #stats,
+        [data-theme="dark"] .advanced-filters,
+        [data-theme="dark"] #alphabetBar,
+        [data-theme="dark"] .settings-section {
+            background: var(--input-bg);
+            border-color: var(--border);
+        }
+
+        [data-theme="dark"] #alphabetBar span {
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .settings-section h4 {
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            background: var(--text-muted);
+            color: white;
+        }
+
+        [data-theme="dark"] .progress-bar {
+            background: var(--border);
+        }
+
+        [data-theme="dark"] .file-info,
+        [data-theme="dark"] .subtitle {
+            color: var(--text-muted);
+        }
+
+        [data-theme="dark"] .fab-action {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] input:-webkit-autofill,
+        [data-theme="dark"] input:-webkit-autofill:hover,
+        [data-theme="dark"] input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #0a1020 inset !important;
+            -webkit-text-fill-color: #e8f0fe !important;
+            background-color: #0a1020 !important;
+        }
+
+        /* ======================================== */
+        /* 22. TOUCH DEVICE IMPROVEMENTS           */
+        /* ======================================== */
+        @media (hover: none) and (pointer: coarse) {
+
+            .btn:hover,
+            .fab:hover,
+            .fab-action:hover,
+            #alphabetBar span:hover,
+            .settings-btn:hover {
+                transform: none;
+            }
+
+            .btn:active {
+                transform: scale(0.97);
+            }
+
+            .fab:active {
+                transform: scale(0.95);
+            }
+
+            .fab-action:active {
+                transform: scale(0.92);
+            }
+
+            input:active,
+            textarea:active,
+            select:active {
+                transform: scale(0.99);
+            }
+
+            textarea {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* ======================================== */
+        /* 23. ANDROID KEYBOARD FIX                */
+        /* ======================================== */
+        @media (max-height: 500px) {
+            body {
+                padding-bottom: 200px;
+            }
+
+            .fab-container {
+                bottom: 10px;
+            }
+
+            #toast {
+                bottom: 70px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header" id="headerSection">
+            <h1>🚀 Gboard Dictionary Pro</h1>
+            <p class="subtitle">Advanced Dictionary Editor</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <span class="progress-text" id="progressText">Loading... </span>
+        </div>
+
+        <!-- Editor Tab -->
+        <div id="editor-tab" class="tab-content active">
+            <!-- File Upload -->
+            <div class="card full-width-section" id="fileManagementCard">
+                <h3>📁 File Management</h3>
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept=".txt,.zip">
+                    <button class="btn" id="fileBtn">📂 Choose File</button>
+                    <span class="file-info" id="fileName">No file selected</span>
+                </div>
+            </div>
+
+            <!-- Text Area -->
+            <div class="card full-width-section" id="dictionaryContentCard">
+                <h3>📝 Dictionary Content</h3>
+                <textarea id="textArea"
+                    placeholder="Your dictionary content will appear here...&#10;Format: shortcut&#9;value&#9;en-US&#9;"
+                    spellcheck="false"></textarea>
+            </div>
+
+            <!-- LEFT COLUMN -->
+            <div class="editor-left-column">
+                <!-- Quick Actions -->
+                <div class="card" id="quickActionsCard">
+                    <h3>⚡ Quick Actions</h3>
+                    <div class="actions-grid">
+                        <button class="btn" onclick="sortLines()">🔀 Sort</button>
+                        <button class="btn" onclick="removeEmptyLines()">🗑️ Spaces</button>
+                        <button class="btn" onclick="removeDuplicates()">📑 Duplicates</button>
+                        <button class="btn" onclick="removeExtraSpaces()">✨ Format</button>
+                        <button class="btn btn-success" onclick="downloadFile()">📥 TXT</button>
+                        <button class="btn btn-success" onclick="downloadZip()">📦 ZIP</button>
+                        <button class="btn btn-warning" onclick="sendToTelegram()">📤 Telegram</button>
+                        <button class="btn" onclick="goToLastChange()">🟢 Changed</button>
+                    </div>
+                </div>
+
+                <!-- Add Entry -->
+                <div class="card" id="newEntryCard">
+                    <h3 style="color: greenyellow;">➕ New Entry</h3>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Shortcut</label>
+                            <input type="text" id="shortcutInput" placeholder="Enter shortcut... ">
+                        </div>
+                        <div class="input-field">
+                            <label>Value</label>
+                            <input type="text" id="valueInput" placeholder="Enter full value... ">
+                        </div>
+                        <button class="btn" onclick="addEntry()">Add Entry</button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="card" id="advancedFiltersCard">
+                    <h3>🔍 Advanced Filters</h3>
+
+                    <!-- 🔽 টগল 1: অ্যাডভান্সড অপশনস -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 10px; background: var(--bg); border-radius: 8px;">
+                        <label style="font-weight: 600; font-size: 0.85rem;">🎛️ Advanced Options</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="advancedOptionsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- 🔽 টগল 2: এক্সাক্ট ম্যাচ টগল (NEW) -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding: 10px; background: var(--bg); border-radius: 8px; border-left: 3px solid var(--primary);">
+                        <div>
+                            <label style="font-weight: 700; font-size: 0.85rem;">🎯 Exact Match Mode</label>
+                            <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 2px;">Only show exact
+                                matches (no partial results)</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="exactMatchToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="advanced-filters" id="advancedFiltersContainer">
+                        <div class="filter-group">
+                            <label>🔤 Shortcut Filter</label>
+                            <input type="text" id="shortcutFilter" placeholder="Filter shortcuts...">
+                        </div>
+                        <div class="filter-group">
+                            <label>📝 Value Filter</label>
+                            <input type="text" id="valueFilter" placeholder="Filter values...">
+                        </div>
+                        <div class="filter-group" id="filterTypeGroup">
+                            <label>🎯 Filter Type</label>
+                            <select id="filterType">
+                                <option value="contains">Contains</option>
+                                <option value="startsWith">Starts With</option>
+                                <option value="endsWith">Ends With</option>
+                            </select>
+                        </div>
+                        <div class="filter-group" id="sortByGroup">
+                            <label>📊 Sort By</label>
+                            <select id="sortBy">
+                                <option value="shortcut">Shortcut A-Z</option>
+                                <option value="shortcut-desc">Shortcut Z-A</option>
+                                <option value="value">Value A-Z</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="clearFilters()" style="margin-top: 6px; width: 100%;">❌ Clear
+                        Filters</button>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="editor-right-column">
+                <!-- Preview Section -->
+                <div class="card" id="previewCard">
+                    <h3>👁️ Live Preview</h3>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>✏️ Edit Shortcut</label>
+                            <input type="text" id="editShortcut" placeholder="Edit shortcut...">
+                        </div>
+                        <div class="input-field">
+                            <label>📝 Edit Value</label>
+                            <input type="text" id="editValue" placeholder="Edit value...">
+                        </div>
+                    </div>
+
+                    <div class="edit-controls">
+                        <button class="btn btn-success" id="applyEditBtn">✅ Apply</button>
+                        <button class="btn btn-danger" id="deleteBtn">🗑️ Delete</button>
+                    </div>
+
+                    <div id="alphabetBar"></div>
+                    <div id="preview"></div>
+                    <div id="stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Button -->
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>⚙️ Settings</h3>
+                <button class="close-settings" onclick="closeSettings()">&times;</button>
+            </div>
+
+            <div class="settings-section">
+                <h4>🎨 Theme Settings</h4>
+                <div class="filter-group">
+                    <label>🌓 Theme</label>
+                    <select id="themeSelect" onchange="changeTheme(this.value)">
+                        <option value="auto">Auto</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>⚙️ Editor Settings</h4>
+                <div class="filter-group">
+                    <label>💾 Auto-save</label>
+                    <select id="autoSave">
+                        <option value="true">Enabled</option>
+                        <option value="false">Disabled</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="margin-top: 10px;">
+                    <label>⏱️ Backup Interval</label>
+                    <select id="backupInterval">
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                        <option value="30">30 minutes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>🔑 Telegram Settings</h4>
+                <div class="filter-group">
+                    <label>🤖 Bot Token</label>
+                    <input type="password" id="botToken" placeholder="Enter your bot token">
+                </div>
+                <div class="filter-group" style="margin-top: 10px;">
+                    <label>💬 Chat ID</label>
+                    <input type="text" id="chatId" placeholder="Enter your chat ID">
+                </div>
+                <button class="btn" onclick="saveTelegramSettings()" style="margin-top: 12px; width: 100%;">💾 Save
+                    Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <div class="fab-container">
+        <button class="fab" onclick="toggleQuickActions()">⚡</button>
+        <div class="fab-actions" id="fabActions">
+            <button class="fab-action" onclick="toggleSection('headerSection')" title="Header">🚀</button>
+            <button class="fab-action" onclick="toggleSection('fileManagementCard')" title="File Management">📁</button>
+            <button class="fab-action" onclick="toggleSection('dictionaryContentCard')"
+                title="Dictionary Content">📝</button>
+            <button class="fab-action" onclick="toggleSection('quickActionsCard')" title="Quick Actions">⚡</button>
+            <button class="fab-action" onclick="toggleSection('newEntryCard')" title="New Entry">➕</button>
+            <button class="fab-action" onclick="toggleSection('advancedFiltersCard')"
+                title="Advanced Filters">🔍</button>
+            <!-- 🔽 দুটি নতুন বাটন যোগ করুন -->
+            <button class="fab-action" onclick="toggleSection('previewCard')" title="Live Preview">👁️</button>
+            <button class="fab-action" onclick="quickExport()" title="Quick Export">📤</button>
+            <button class="fab-action" onclick="resetAllSections()" title="Reset All">🔄</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // ==================== GLOBAL VARIABLES ====================
+        const fileInput = document.getElementById('fileInput');
+        const textArea = document.getElementById('textArea');
+        const preview = document.getElementById('preview');
+        const shortcutInput = document.getElementById('shortcutInput');
+        const valueInput = document.getElementById('valueInput');
+        const shortcutFilter = document.getElementById('shortcutFilter');
+        const valueFilter = document.getElementById('valueFilter');
+        const editShortcut = document.getElementById('editShortcut');
+        const editValue = document.getElementById('editValue');
+        const applyEditBtn = document.getElementById('applyEditBtn');
+        const stats = document.getElementById('stats');
+        const fileBtn = document.getElementById('fileBtn');
+        const fileName = document.getElementById('fileName');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const toast = document.getElementById('toast');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        let filteredLines = [];
+        let selectedIndex = -1;
+        let scrollToSelected = true;
+        let lastChangedIndex = -1;
+        let isFabOpen = false;
+
+        // ==================== THEME MANAGEMENT ====================
+        function changeTheme(theme) {
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.body.setAttribute('data-theme', theme);
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        changeTheme(savedTheme);
+        if (document.getElementById('themeSelect')) {
+            document.getElementById('themeSelect').value = savedTheme;
+        }
+
+        // ==================== SETTINGS MODAL ====================
+        function openSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('settingsModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeSettings();
+            }
+        });
+
+        // ==================== FAB ACTIONS ====================
+        function toggleQuickActions() {
+            const fabActions = document.getElementById('fabActions');
+            isFabOpen = !isFabOpen;
+            fabActions.classList.toggle('show', isFabOpen);
+        }
+
+
+        function quickExport() {
+            downloadZip();
+        }
+
+
+        // সেকশন টগল করার ফাংশন
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            // ক্লাস টগল করি
+            if (section.classList.contains('section-hidden')) {
+                section.classList.remove('section-hidden');
+                showToast(`${getSectionName(sectionId)} shown`, 'success');
+
+                // localStorage-এ state সেভ করি
+                saveSectionState(sectionId, false);
+            } else {
+                section.classList.add('section-hidden');
+                showToast(`${getSectionName(sectionId)} hidden`, 'info');
+
+                // localStorage-এ state সেভ করি
+                saveSectionState(sectionId, true);
+            }
+
+            // লেআউট আপডেট করি
+            setTimeout(() => {
+                if (typeof updatePreview === 'function') updatePreview();
+            }, 100);
+        }
+
+        // সেকশনের নাম দেখানোর জন্য (আপডেটেড)
+        function getSectionName(sectionId) {
+            const names = {
+                'fileManagementCard': '📁 File Management',
+                'dictionaryContentCard': '📝 Dictionary Content',
+                'newEntryCard': '➕ New Entry',
+                'advancedFiltersCard': '🔍 Advanced Filters',
+                'quickActionsCard': '⚡ Quick Actions',
+                'previewCard': '👁️ Live Preview',     // নতুন যোগ করুন
+                'headerSection': '🚀 Header'           // নতুন যোগ করুন
+            };
+            return names[sectionId] || sectionId;
+        }
+
+        // localStorage-এ সেকশনের state সেভ করা
+        function saveSectionState(sectionId, isHidden) {
+            let hiddenSections = JSON.parse(localStorage.getItem('hiddenSections') || '{}');
+            hiddenSections[sectionId] = isHidden;
+            localStorage.setItem('hiddenSections', JSON.stringify(hiddenSections));
+        }
+
+        // লোড করার সময় আগের state রিস্টোর করা
+        function loadSectionStates() {
+            const hiddenSections = JSON.parse(localStorage.getItem('hiddenSections') || '{}');
+
+            Object.keys(hiddenSections).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section && hiddenSections[sectionId]) {
+                    section.classList.add('section-hidden');
+                }
+            });
+        }
+
+        // সব সেকশন রিসেট করার ফাংশন (আপডেটেড)
+        function resetAllSections() {
+            const sections = [
+                'fileManagementCard',
+                'dictionaryContentCard',
+                'newEntryCard',
+                'advancedFiltersCard',
+                'quickActionsCard',
+                'previewCard',      // নতুন যোগ করুন
+                'headerSection'     // নতুন যোগ করুন
+            ];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.classList.remove('section-hidden');
+                    saveSectionState(sectionId, false);
+                }
+            });
+            showToast('All sections restored', 'success');
+        }
+
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(msg, type = 'info') {
+            toast.textContent = msg;
+            toast.style.background = type === 'error' ? 'var(--danger)' :
+                type === 'success' ? 'var(--success)' : 'var(--toast-bg)';
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function updateProgress(percentage, text) {
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = text;
+        }
+
+        // ==================== TEXTAREA CURSOR NAVIGATION ====================
+        function updateEditableFromTextarea() {
+            const cursorPos = textArea.selectionStart;
+            const lines = textArea.value.split('\n');
+            let cumulative = 0;
+            let lineIndex = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                cumulative += lines[i].length + 1;
+                if (cursorPos <= cumulative) {
+                    lineIndex = i;
+                    break;
+                }
+            }
+
+            const line = lines[lineIndex];
+            const fi = filteredLines.indexOf(line);
+            selectedIndex = fi >= 0 ? fi : -1;
+
+            if (selectedIndex >= 0) {
+                scrollToSelected = true;
+                updatePreview();
+                updateEditableFields();
+            }
+        }
+
+        // ==================== EXACT MATCH TOGGLE FUNCTION ====================
+        let exactMatchEnabled = false;
+
+        function initExactMatchToggle() {
+            const exactMatchToggle = document.getElementById('exactMatchToggle');
+
+            // লোড করা অবস্থা রিস্টোর করা
+            const savedExactMatch = localStorage.getItem('exactMatchEnabled');
+            if (savedExactMatch !== null) {
+                exactMatchEnabled = savedExactMatch === 'true';
+                exactMatchToggle.checked = exactMatchEnabled;
+            }
+
+            // টগল চেঞ্জ ইভেন্ট
+            exactMatchToggle.addEventListener('change', function () {
+                exactMatchEnabled = this.checked;
+                localStorage.setItem('exactMatchEnabled', exactMatchEnabled);
+
+                // ফিল্টার রিসেট না করে আপডেট করা
+                updatePreview();
+
+                showToast(exactMatchEnabled ?
+                    '🔍 Exact Match Mode: ON - Only exact shortcuts/values will match' :
+                    '🔍 Exact Match Mode: OFF - Partial matches allowed',
+                    'info'
+                );
+            });
+        }
+
+        // ==================== AUTO FILL VALUE FROM EXACT SHORTCUT MATCH ====================
+        function setupAutoValueFill() {
+            const shortcutFilterInput = document.getElementById('shortcutFilter');
+            const valueFilterInput = document.getElementById('valueFilter');
+            const exactMatchToggle = document.getElementById('exactMatchToggle');
+
+            function autoFillValueFromExactMatch() {
+                // শুধু তখনই কাজ করবে যখন Exact Match Mode ON থাকবে
+                if (!exactMatchToggle.checked) return;
+
+                const searchShortcut = shortcutFilterInput.value.trim().toLowerCase();
+
+                if (searchShortcut === '') {
+                    // যদি শর্টকাট ফিল্টার খালি হয়, তাহলে ভ্যালু ফিল্টারও খালি করবে
+                    if (valueFilterInput.value !== '') {
+                        valueFilterInput.value = '';
+                        updatePreview(); // প্রিভিউ আপডেট করবে
+                    }
+                    return;
+                }
+
+                // ডিকশনারির সব লাইন থেকে exact match খোঁজা
+                const lines = textArea.value.split('\n').filter(line => line.trim());
+                let exactMatchValue = '';
+
+                for (const line of lines) {
+                    const parts = line.split('\t');
+                    const shortcut = parts[0]?.toLowerCase() || '';
+
+                    if (shortcut === searchShortcut) {
+                        exactMatchValue = parts[1] || '';
+                        break;
+                    }
+                }
+
+                // ভ্যালু ফিল্ড আপডেট করা
+                if (valueFilterInput.value !== exactMatchValue) {
+                    valueFilterInput.value = exactMatchValue;
+                    updatePreview(); // ভ্যালু ফিল্টার চেঞ্জ হলে প্রিভিউ আপডেট
+                }
+            }
+
+            // ইভেন্ট লিসেনার
+            shortcutFilterInput.addEventListener('input', autoFillValueFromExactMatch);
+
+            // Exact Match টগল চেঞ্জ হলে ভ্যালু ফিল্ড রিসেট করা
+            exactMatchToggle.addEventListener('change', function () {
+                if (!this.checked) {
+                    // Exact Match OFF হলে ভ্যালু ফিল্টার ক্লিয়ার করবে
+                    valueFilterInput.value = '';
+                } else {
+                    // Exact Match ON হলে বর্তমান শর্টকাটের ভ্যালু সেট করবে
+                    autoFillValueFromExactMatch();
+                }
+                updatePreview();
+            });
+        }
+
+        // ==================== PREVIEW SYSTEM ====================
+        function updatePreview() {
+            const lines = textArea.value.split('\n').filter(line => line.trim());
+            const counts = {};
+            lines.forEach(line => {
+                const sc = line.split('\t')[0];
+                if (sc) counts[sc] = (counts[sc] || 0) + 1;
+            });
+
+            const sFilter = shortcutFilter.value.toLowerCase();
+            const vFilter = valueFilter.value.toLowerCase();
+            const filterType = document.getElementById('filterType').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            // Check if advanced options are enabled
+            const advancedOptionsEnabled = document.getElementById('advancedOptionsToggle')?.checked || true;
+
+            filteredLines = lines.filter(line => {
+                const parts = line.split('\t');
+                const sc = parts[0]?.toLowerCase() || '';
+                const val = parts[1]?.toLowerCase() || '';
+
+                let scMatch = false, valMatch = false;
+
+                // EXACT MATCH LOGIC (NEW)
+                if (exactMatchEnabled) {
+                    // Exact match mode: Full string comparison
+                    if (sFilter === '') {
+                        scMatch = true;  // No filter means all pass
+                    } else {
+                        scMatch = (sc === sFilter);
+                    }
+
+                    if (vFilter === '') {
+                        valMatch = true;
+                    } else {
+                        valMatch = (val === vFilter);
+                    }
+                } else {
+                    // Normal mode with filter type
+                    if (advancedOptionsEnabled) {
+                        switch (filterType) {
+                            case 'startsWith':
+                                scMatch = sc.startsWith(sFilter);
+                                valMatch = val.startsWith(vFilter);
+                                break;
+                            case 'endsWith':
+                                scMatch = sc.endsWith(sFilter);
+                                valMatch = val.endsWith(vFilter);
+                                break;
+                            default: // contains
+                                scMatch = sc.includes(sFilter);
+                                valMatch = val.includes(vFilter);
+                        }
+                    } else {
+                        // Advanced options disabled - simple contains only
+                        scMatch = sc.includes(sFilter);
+                        valMatch = val.includes(vFilter);
+                    }
+                }
+
+                // If both filters are empty, show all
+                if (sFilter === '' && vFilter === '') {
+                    return true;
+                }
+
+                // If only shortcut filter has value
+                if (sFilter !== '' && vFilter === '') {
+                    return scMatch;
+                }
+
+                // If only value filter has value
+                if (vFilter !== '' && sFilter === '') {
+                    return valMatch;
+                }
+
+                // Both filters have values
+                return scMatch && valMatch;
+            });
+
+            // Sorting logic (unmodified)
+            if (advancedOptionsEnabled) {
+                filteredLines.sort((a, b) => {
+                    const aParts = a.split('\t');
+                    const bParts = b.split('\t');
+
+                    switch (sortBy) {
+                        case 'shortcut-desc':
+                            return (bParts[0] || '').localeCompare(aParts[0] || '');
+                        case 'value':
+                            return (aParts[1] || '').localeCompare(bParts[1] || '');
+                        default:
+                            return (aParts[0] || '').localeCompare(bParts[0] || '');
+                    }
+                });
+            } else {
+                // Default sorting by shortcut A-Z when advanced options disabled
+                filteredLines.sort((a, b) => {
+                    return (a.split('\t')[0] || '').localeCompare(b.split('\t')[0] || '');
+                });
+            }
+
+            const prevClasses = [];
+            Array.from(preview.children).forEach(div => {
+                prevClasses.push({
+                    sc: div.querySelector(".shortcut")?.textContent,
+                    cls: div.className
+                });
+            });
+
+            preview.innerHTML = filteredLines.map((line, i) => {
+                const parts = line.split('\t');
+                const sc = parts[0] || '', val = parts[1] || '';
+                const isDup = counts[sc] > 1, isSelected = i === selectedIndex;
+
+                const prev = prevClasses.find(p => p.sc === sc);
+                let cls = isSelected ? 'selected' : '';
+                if (isDup) cls += ' highlight';
+                if (prev) cls += ' ' + prev.cls.replace('selected', '').replace('highlight', '').trim();
+
+                // Add exact match indicator
+                let exactMatchIndicator = '';
+                if (exactMatchEnabled && sFilter !== '' && sc.toLowerCase() === sFilter) {
+                    cls += ' exact-match';
+                }
+
+                return `<div class="${cls}" data-index="${i}">
+            <span class="shortcut">${escapeHtml(sc)}${exactMatchIndicator}</span>
+            <span class="value">${escapeHtml(val)}</span>
+        </div>`;
+            }).join('');
+
+            let dup = 0;
+            for (let k in counts) if (counts[k] > 1) dup += counts[k] - 1;
+
+            const exactMatchText = exactMatchEnabled ? ' | Exact Match Mode: ON' : '';
+            const lineNumberText = selectedIndex >= 0 ? `Line: ${selectedIndex + 1} | ` : '';
+            stats.textContent = `${lineNumberText}Total: ${lines.length} | Duplicates: ${dup} | Filtered: ${filteredLines.length}${exactMatchText}`;
+
+            updateEditableFields();
+            updateProgress((filteredLines.length / Math.max(lines.length, 1)) * 100, `${filteredLines.length} entries displayed`);
+
+            if (scrollToSelected && selectedIndex >= 0) {
+                const child = preview.children[selectedIndex];
+                if (child) {
+                    preview.scrollTop = child.offsetTop - preview.offsetTop;
+                }
+            }
+            scrollToSelected = true;
+        }
+
+        function updateEditableFields() {
+            if (selectedIndex >= 0 && filteredLines[selectedIndex]) {
+                const parts = filteredLines[selectedIndex].split('\t');
+                editShortcut.value = parts[0] || '';
+                editValue.value = parts[1] || '';
+            } else {
+                editShortcut.value = '';
+                editValue.value = '';
+            }
+        }
+
+        // ==================== FILE HANDLING ====================
+        fileBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            fileName.textContent = file.name;
+            updateProgress(0, 'Loading file...');
+
+            const reader = new FileReader();
+
+            if (file.name.endsWith('.txt')) {
+                reader.onload = e => {
+                    textArea.value = e.target.result;
+                    updatePreview();
+                    updateProgress(100, 'File loaded successfully');
+                    showToast('Text file loaded successfully', 'success');
+                };
+                reader.readAsText(file);
+            } else if (file.name.endsWith('.zip')) {
+                reader.onload = e => {
+                    JSZip.loadAsync(e.target.result).then(zip => {
+                        const dictFile = zip.file("dictionary.txt");
+                        if (dictFile) {
+                            dictFile.async("string").then(content => {
+                                textArea.value = content;
+                                updatePreview();
+                                updateProgress(100, 'ZIP file extracted successfully');
+                                showToast('ZIP file extracted successfully', 'success');
+                            });
+                        } else {
+                            showToast("No dictionary.txt found in ZIP file", 'error');
+                        }
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        // ==================== LINE OPERATIONS ====================
+        function removeEmptyLines() {
+            textArea.value = textArea.value.split('\n').filter(l => l.trim() !== '').join('\n');
+            updatePreview();
+            showToast("Empty lines removed!", 'success');
+        }
+
+        function removeDuplicates() {
+            const seen = new Set();
+            const lines = textArea.value.split('\n');
+            const result = [];
+
+            lines.forEach(line => {
+                const sc = line.split('\t')[0];
+                if (!seen.has(sc)) {
+                    seen.add(sc);
+                    result.push(line);
+                }
+            });
+
+            textArea.value = result.join('\n');
+            updatePreview();
+            showToast("Duplicates removed!", 'success');
+        }
+
+        function removeExtraSpaces() {
+            const lines = textArea.value.split('\n');
+            const cleaned = lines.map(line => line.split('\t').map(p => p.trim()).join('\t'));
+            textArea.value = cleaned.join('\n');
+            updatePreview();
+            showToast("Extra spaces cleaned!", 'success');
+        }
+
+        function sortLines() {
+            const lines = textArea.value.split('\n');
+            const comments = lines.filter(l => l.trim().startsWith('#'));
+            const normal = lines.filter(l => !l.trim().startsWith('#'));
+            normal.sort((a, b) => (a.split('\t')[0] || '').localeCompare(b.split('\t')[0] || ''));
+            textArea.value = [...comments, ...normal].join('\n');
+            updatePreview();
+            showToast("Lines sorted alphabetically!", 'success');
+        }
+
+        // ==================== ENTRY MANAGEMENT ====================
+        function addEntry() {
+            const sc = shortcutInput.value.trim();
+            const val = valueInput.value.trim();
+            if (!sc || !val) return showToast('Please enter both shortcut and value!', 'error');
+
+            const newEntry = `${sc}\t${val}\ten-US\t`;
+            textArea.value += (textArea.value ? '\n' : '') + newEntry;
+            shortcutInput.value = valueInput.value = '';
+            updatePreview();
+            shortcutInput.focus();
+            showToast("New entry added!", 'success');
+
+            selectedIndex = filteredLines.length - 1;
+            lastChangedIndex = selectedIndex;
+            const newDiv = preview.children[selectedIndex];
+            if (newDiv) newDiv.classList.add('new-entry');
+        }
+
+        applyEditBtn.addEventListener('click', () => {
+            if (selectedIndex < 0) return showToast("No entry selected!", 'error');
+            const lines = textArea.value.split('\n');
+            const targetLine = filteredLines[selectedIndex];
+            const indexInAll = lines.indexOf(targetLine);
+            if (indexInAll < 0) return;
+
+            lines[indexInAll] = `${editShortcut.value}\t${editValue.value}\ten-US\t`;
+            textArea.value = lines.join('\n');
+            updatePreview();
+            showToast("Entry updated!", 'success');
+
+            const editedDiv = preview.children[selectedIndex];
+            if (editedDiv) {
+                editedDiv.classList.remove('new-entry');
+                editedDiv.classList.add('edited-entry');
+                lastChangedIndex = selectedIndex;
+            }
+        });
+
+        function deleteEntry() {
+            if (selectedIndex < 0) return showToast("No entry selected!", 'error');
+            const lines = textArea.value.split('\n');
+            const targetLine = filteredLines[selectedIndex];
+            const indexInAll = lines.indexOf(targetLine);
+            if (indexInAll >= 0) {
+                lines.splice(indexInAll, 1);
+                textArea.value = lines.join('\n');
+                selectedIndex = -1;
+                updatePreview();
+                showToast("Entry deleted!", 'success');
+            }
+        }
+
+        deleteBtn.addEventListener('click', deleteEntry);
+
+        function goToLastChange() {
+            if (lastChangedIndex >= 0 && lastChangedIndex < filteredLines.length) {
+                selectedIndex = lastChangedIndex;
+                scrollToSelected = true;
+                updatePreview();
+                updateEditableFields();
+                showToast("Jumped to last changed entry!", 'success');
+            } else {
+                showToast("No changes to jump to!", 'error');
+            }
+        }
+
+        // ==================== TELEGRAM SETTINGS ====================
+        function saveTelegramSettings() {
+            const botToken = document.getElementById('botToken').value;
+            const chatId = document.getElementById('chatId').value;
+
+            if (botToken && chatId) {
+                localStorage.setItem('telegramBotToken', botToken);
+                localStorage.setItem('telegramChatId', chatId);
+                showToast("Telegram settings saved!", 'success');
+                closeSettings();
+            } else {
+                showToast("Please enter both Bot Token and Chat ID!", 'error');
+            }
+        }
+
+        async function sendToTelegram() {
+            const BOT_TOKEN = localStorage.getItem('telegramBotToken') || "YOUR_BOT_TOKEN";
+            const CHAT_ID = localStorage.getItem('telegramChatId') || "YOUR_CHAT_ID";
+
+            if (BOT_TOKEN === "YOUR_BOT_TOKEN") {
+                showToast("Please configure Telegram settings first!", 'error');
+                openSettings();
+                return;
+            }
+
+            const textContent = textArea.value || "File is empty!";
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const formData = new FormData();
+            formData.append("chat_id", CHAT_ID);
+            formData.append("document", blob, "dictionary.txt");
+
+            try {
+                showToast("Sending to Telegram...", 'info');
+                const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+                    method: "POST",
+                    body: formData
+                });
+                if (res.ok) {
+                    showToast("✅ File sent to Telegram!", 'success');
+                } else {
+                    showToast("⚠️ Failed to send file!", 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("❌ Error sending file!", 'error');
+            }
+        }
+
+        // ==================== ALPHABET BAR ====================
+        function initAlphabetBar() {
+            const alphabetBar = document.getElementById("alphabetBar");
+            alphabetBar.innerHTML = '';
+
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(letter => {
+                const span = document.createElement("span");
+                span.textContent = letter;
+                span.addEventListener("click", () => jumpToLetter(letter.toLowerCase()));
+                alphabetBar.appendChild(span);
+            });
+        }
+
+        function jumpToLetter(letter) {
+            for (let i = 0; i < preview.children.length; i++) {
+                const sc = preview.children[i].querySelector(".shortcut")?.textContent.toLowerCase();
+                if (sc && sc.startsWith(letter)) {
+                    selectedIndex = i;
+                    scrollToSelected = true;
+                    updatePreview();
+                    updateEditableFields();
+                    showToast(`Jumped to entries starting with "${letter}"`);
+                    break;
+                }
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        textArea.addEventListener('click', updateEditableFromTextarea);
+        textArea.addEventListener('keyup', updateEditableFromTextarea);
+        textArea.addEventListener('input', updateEditableFromTextarea);
+
+        textArea.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                setTimeout(() => {
+                    updateEditableFromTextarea();
+                }, 10);
+            }
+        });
+
+        shortcutFilter.addEventListener('input', () => {
+            selectedIndex = -1;
+            updatePreview();
+        });
+
+        valueFilter.addEventListener('input', () => {
+            selectedIndex = -1;
+            updatePreview();
+        });
+
+        document.getElementById('filterType').addEventListener('change', updatePreview);
+        document.getElementById('sortBy').addEventListener('change', updatePreview);
+
+        preview.addEventListener('click', e => {
+            const div = e.target.closest('div');
+            if (div) {
+                const index = parseInt(div.getAttribute('data-index'));
+                if (!isNaN(index)) {
+                    selectedIndex = index;
+                    updatePreview();
+                    updateEditableFields();
+                }
+            }
+        });
+
+        function clearFilters() {
+            shortcutFilter.value = valueFilter.value = '';
+            selectedIndex = 0;
+            scrollToSelected = true;
+            updatePreview();
+            showToast("Filters cleared!", 'success');
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        window.addEventListener('keydown', e => {
+            const active = document.activeElement;
+            const isEditing = active === textArea || active === shortcutInput || active === valueInput ||
+                active === editShortcut || active === editValue;
+
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 's': e.preventDefault(); downloadFile(); break;
+                    case 'd': e.preventDefault(); removeDuplicates(); break;
+                    case 'e': e.preventDefault(); removeEmptyLines(); break;
+                    case 'k': e.preventDefault(); removeExtraSpaces(); break;
+                    case 'l': e.preventDefault(); sortLines(); break;
+                    case 'o': e.preventDefault(); fileInput.click(); break;
+                }
+            }
+
+            if (active === textArea) {
+                switch (e.key) {
+                    case 'ArrowDown':
+                    case 'ArrowUp':
+                        break;
+                    case 'Enter':
+                        setTimeout(updateEditableFromTextarea, 10);
+                        break;
+                }
+            }
+
+            if (!isEditing && filteredLines.length > 0 && active !== textArea) {
+                switch (e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        selectedIndex = Math.min(selectedIndex + 1, filteredLines.length - 1);
+                        scrollToSelected = true;
+                        updatePreview();
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        selectedIndex = Math.max(selectedIndex - 1, 0);
+                        scrollToSelected = true;
+                        updatePreview();
+                        break;
+                    case 'Delete':
+                        e.preventDefault();
+                        deleteEntry();
+                        break;
+                }
+            }
+
+            if (e.key === 'Enter') {
+                if (active === shortcutInput || active === valueInput) {
+                    e.preventDefault();
+                    addEntry();
+                } else if (active === editShortcut || active === editValue) {
+                    e.preventDefault();
+                    applyEditBtn.click();
+                }
+            }
+        });
+
+        shortcutInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addEntry();
+            }
+        });
+        valueInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addEntry();
+            }
+        });
+        editShortcut.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyEditBtn.click();
+            }
+        });
+        editValue.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyEditBtn.click();
+            }
+        });
+
+        // ==================== DOWNLOAD FUNCTIONS ====================
+        function downloadFile() {
+            const blob = new Blob([textArea.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // টাইমস্ট্যাম্প জেনারেট করা
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+
+            const day = now.getDate();
+            const month = now.toLocaleString('default', { month: 'long' });
+
+            // ফাইলের নাম: dictionary_09_85_PM_04_April.txt
+            const filename = `dictionary_${formattedHours}_${formattedMinutes}_${ampm}_${day}_${month}.txt`;
+
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded as: ${filename}`, 'success');
+        }
+
+        function downloadZip() {
+            const zip = new JSZip();
+            zip.file("dictionary.txt", textArea.value);
+
+            // টাইমস্ট্যাম্প জেনারেট করা (একই ফরম্যাট)
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const hours12 = hours % 12 || 12;
+            const formattedHours = hours12.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+
+            const day = now.getDate();
+            const month = now.toLocaleString('default', { month: 'long' });
+            const year = now.getFullYear();
+
+            // জিপ ফাইলের নাম তৈরি: gboard_dictionary_02_45_PM_04_April_2026.zip
+            const zipFilename = `gboard_dictionary_${formattedHours}_${formattedMinutes}_${ampm}_${day}_${month}_${year}.zip`;
+
+            zip.generateAsync({ type: "blob" }).then(content => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(content);
+                a.download = zipFilename;
+                a.click();
+                showToast(`Downloaded as: ${zipFilename}`, 'success');
+            });
+        }
+
+        // ==================== ADVANCED OPTIONS TOGGLE ====================
+        function initAdvancedOptionsToggle() {
+            const toggle = document.getElementById('advancedOptionsToggle');
+            const filterTypeGroup = document.getElementById('filterTypeGroup');
+            const sortByGroup = document.getElementById('sortByGroup');
+
+            // লোড করা অবস্থা রিস্টোর করা
+            const savedState = localStorage.getItem('advancedOptionsEnabled');
+            if (savedState !== null) {
+                toggle.checked = savedState === 'true';
+            }
+
+            // টগল স্টেট অনুযায়ী গ্রুপ দেখানো/লুকানো
+            function updateGroupsVisibility() {
+                if (toggle.checked) {
+                    filterTypeGroup.style.display = 'flex';
+                    sortByGroup.style.display = 'flex';
+                } else {
+                    filterTypeGroup.style.display = 'none';
+                    sortByGroup.style.display = 'none';
+                }
+            }
+
+            updateGroupsVisibility();
+
+            // টগল চেঞ্জ ইভেন্ট
+            toggle.addEventListener('change', function () {
+                updateGroupsVisibility();
+                localStorage.setItem('advancedOptionsEnabled', this.checked);
+
+                // টগল অফ থাকলে Filter Type ও Sort By রিসেট করে ডিফল্ট প্রিভিউ দেখানো
+                if (!this.checked) {
+                    // ফিল্টার টাইপ রিসেট না করে শুধু ইনঅ্যাকটিভ করে রাখা হচ্ছে
+                    // কিন্তু updatePreview() কল করা লাগবে না কারণ গ্রুপ hidden থাকলেও 
+                    // আগের সিলেক্টেড ভ্যালু কাজ করবে না - বরং এখানে রিসেট করা ভালো
+                    document.getElementById('filterType').value = 'contains';
+                    document.getElementById('sortBy').value = 'shortcut';
+                }
+
+                updatePreview();
+                showToast(this.checked ? 'Advanced options enabled' : 'Advanced options disabled', 'info');
+            });
+        }
+
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            updatePreview();
+            initAlphabetBar();
+            initAdvancedOptionsToggle();
+            initExactMatchToggle();
+            setupAutoValueFill();
+
+            // সেকশনের স্টেট লোড করো
+            loadSectionStates();
+
+            // Load Telegram settings if exists
+            const savedToken = localStorage.getItem('telegramBotToken');
+            const savedChatId = localStorage.getItem('telegramChatId');
+            if (savedToken) document.getElementById('botToken').value = savedToken;
+            if (savedChatId) document.getElementById('chatId').value = savedChatId;
+
+            showToast("Gboard Dictionary Pro Ready! 🚀", 'success');
+        }
+
+        // ✅ এই লাইনটি যোগ করুন - এটাই ইন্সট্রাকশন যা সব ফাংশন রান করাবে
+        init();
+    </script>
+</body>
+
+</html>
