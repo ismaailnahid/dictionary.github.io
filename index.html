@@ -1510,348 +1510,356 @@
                 bottom: 70px;
             }
         }
-        
-        
-        
-        
+
+
+
+
         /* ======================================== */
-/* REDMI NOTE 15 5G - স্পেসিফিক অপটিমাইজেশন */
-/* ======================================== */
+        /* REDMI NOTE 15 5G - স্পেসিফিক অপটিমাইজেশন */
+        /* ======================================== */
 
-/* Redmi Note 15 5G ডিফল্ট (1080x2400 - 20:9 ratio) */
-@media (min-width: 1080px) and (max-width: 1080px) {
-    html {
-        font-size: 17px;
-    }
+        /* Redmi Note 15 5G ডিফল্ট (1080x2400 - 20:9 ratio) */
+        @media (min-width: 1080px) and (max-width: 1080px) {
+            html {
+                font-size: 17px;
+            }
 
-    body {
-        padding: 16px 12px;
-        background: var(--bg);
-    }
+            body {
+                padding: 16px 12px;
+                background: var(--bg);
+            }
 
-    .container {
-        max-width: 100%;
-        padding: 20px 16px;
-        gap: 20px;
-        border-radius: 20px;
-    }
+            .container {
+                max-width: 100%;
+                padding: 20px 16px;
+                gap: 20px;
+                border-radius: 20px;
+            }
 
-    /* হেডার বড় করে */
-    h1 {
-        font-size: 2.2rem;
-        margin-bottom: 8px;
-    }
+            /* হেডার বড় করে */
+            h1 {
+                font-size: 2.2rem;
+                margin-bottom: 8px;
+            }
 
-    .subtitle {
-        font-size: 1rem;
-    }
+            .subtitle {
+                font-size: 1rem;
+            }
 
-    /* ফর্ম এলিমেন্ট বড় টাচ এরিয়ার জন্য */
-    input, textarea, select, button {
-        font-size: 16px !important; /* জুম এড়ানোর জন্য */
-        border-radius: 14px !important;
-    }
+            /* ফর্ম এলিমেন্ট বড় টাচ এরিয়ার জন্য */
+            input,
+            textarea,
+            select,
+            button {
+                font-size: 16px !important;
+                /* জুম এড়ানোর জন্য */
+                border-radius: 14px !important;
+            }
 
-    input, select {
-        min-height: 48px !important;
-        padding: 12px 16px !important;
-    }
+            input,
+            select {
+                min-height: 48px !important;
+                padding: 12px 16px !important;
+            }
 
-    textarea {
-        min-height: 140px !important;
-        padding: 14px 16px !important;
-    }
+            textarea {
+                min-height: 140px !important;
+                padding: 14px 16px !important;
+            }
 
-    /* বাটনগুলো টাচ ফ্রেন্ডলি */
-    .btn {
-        padding: 12px 18px !important;
-        min-height: 48px !important;
-        border-radius: 14px !important;
-        font-size: 0.9rem !important;
-    }
+            /* বাটনগুলো টাচ ফ্রেন্ডলি */
+            .btn {
+                padding: 12px 18px !important;
+                min-height: 48px !important;
+                border-radius: 14px !important;
+                font-size: 0.9rem !important;
+            }
 
-    /* অ্যাকশন গ্রিড ২ কলাম */
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
+            /* অ্যাকশন গ্রিড ২ কলাম */
+            .actions-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
 
-    .actions-grid .btn {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+            .actions-grid .btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
 
-    /* নিউ এন্ট্রি কার্ড */
-    #newEntryCard .input-group {
-        flex-direction: column;
-        gap: 12px;
-    }
+            /* নিউ এন্ট্রি কার্ড */
+            #newEntryCard .input-group {
+                flex-direction: column;
+                gap: 12px;
+            }
 
-    #newEntryCard .input-field {
-        width: 100%;
-    }
+            #newEntryCard .input-field {
+                width: 100%;
+            }
 
-    #newEntryCard .btn {
-        width: 100%;
-        margin-top: 4px;
-        height: 52px;
-    }
+            #newEntryCard .btn {
+                width: 100%;
+                margin-top: 4px;
+                height: 52px;
+            }
 
-    /* এডিট কন্ট্রোলস ২ কলাম */
-    .edit-controls {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
+            /* এডিট কন্ট্রোলস ২ কলাম */
+            .edit-controls {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
 
-    .edit-controls .btn {
-        width: 100%;
-        padding: 12px !important;
-    }
+            .edit-controls .btn {
+                width: 100%;
+                padding: 12px !important;
+            }
 
-    /* প্রিভিউ এলাকা */
-    #preview {
-        height: 420px;
-        padding: 14px;
-        font-size: 15px;
-    }
+            /* প্রিভিউ এলাকা */
+            #preview {
+                height: 420px;
+                padding: 14px;
+                font-size: 15px;
+            }
 
-    #preview div {
-        padding: 14px 12px;
-        margin-bottom: 8px;
-        border-radius: 14px;
-    }
+            #preview div {
+                padding: 14px 12px;
+                margin-bottom: 8px;
+                border-radius: 14px;
+            }
 
-    #preview .shortcut {
-        min-width: 110px;
-        font-size: 15px;
-    }
+            #preview .shortcut {
+                min-width: 110px;
+                font-size: 15px;
+            }
 
-    #preview .value {
-        font-size: 14px;
-    }
+            #preview .value {
+                font-size: 14px;
+            }
 
-    /* আলফাবেট বার - টাচ এর জন্য বড় */
-    #alphabetBar {
-        gap: 8px;
-        padding: 12px 8px;
-        margin: 16px 0;
-    }
+            /* আলফাবেট বার - টাচ এর জন্য বড় */
+            #alphabetBar {
+                gap: 8px;
+                padding: 12px 8px;
+                margin: 16px 0;
+            }
 
-    #alphabetBar span {
-        font-size: 15px;
-        padding: 8px 14px;
-        min-width: 42px;
-        border-radius: 30px;
-        font-weight: 600;
-    }
+            #alphabetBar span {
+                font-size: 15px;
+                padding: 8px 14px;
+                min-width: 42px;
+                border-radius: 30px;
+                font-weight: 600;
+            }
 
-    /* অ্যাডভান্সড ফিল্টার */
-    .advanced-filters {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        padding: 16px;
-    }
+            /* অ্যাডভান্সড ফিল্টার */
+            .advanced-filters {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                padding: 16px;
+            }
 
-    .filter-group label {
-        font-size: 0.85rem;
-        margin-bottom: 6px;
-    }
+            .filter-group label {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+            }
 
-    filter-group select,
-    .filter-group input {
-        min-height: 48px;
-    }
+            filter-group select,
+            .filter-group input {
+                min-height: 48px;
+            }
 
-    /* স্ট্যাটস বার */
-    #stats {
-        font-size: 0.85rem;
-        padding: 12px;
-        margin-top: 12px;
-    }
+            /* স্ট্যাটস বার */
+            #stats {
+                font-size: 0.85rem;
+                padding: 12px;
+                margin-top: 12px;
+            }
 
-    /* FAB - রাইট সাইডে */
-    .fab-container {
-        bottom: 24px;
-        right: 20px;
-    }
+            /* FAB - রাইট সাইডে */
+            .fab-container {
+                bottom: 24px;
+                right: 20px;
+            }
 
-    .fab {
-        width: 60px;
-        height: 60px;
-        border-radius: 30px;
-        font-size: 26px;
-        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
-    }
+            .fab {
+                width: 60px;
+                height: 60px;
+                border-radius: 30px;
+                font-size: 26px;
+                box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+            }
 
-    .fab-actions {
-        bottom: 72px;
-        gap: 14px;
-    }
+            .fab-actions {
+                bottom: 72px;
+                gap: 14px;
+            }
 
-    .fab-action {
-        min-width: 52px;
-        height: 52px;
-        border-radius: 26px;
-        font-size: 20px;
-        padding: 0 16px;
-    }
+            .fab-action {
+                min-width: 52px;
+                height: 52px;
+                border-radius: 26px;
+                font-size: 20px;
+                padding: 0 16px;
+            }
 
-    /* সেটিংস বাটন */
-    .settings-btn {
-        top: 20px;
-        right: 20px;
-        width: 48px;
-        height: 48px;
-        font-size: 22px;
-        border-radius: 50%;
-    }
+            /* সেটিংস বাটন */
+            .settings-btn {
+                top: 20px;
+                right: 20px;
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+                border-radius: 50%;
+            }
 
-    /* সেটিংস মডাল */
-    .settings-content {
-        width: 92%;
-        max-width: 500px;
-        padding: 24px;
-        border-radius: 28px;
-    }
+            /* সেটিংস মডাল */
+            .settings-content {
+                width: 92%;
+                max-width: 500px;
+                padding: 24px;
+                border-radius: 28px;
+            }
 
-    .settings-section {
-        padding: 18px;
-        margin-bottom: 18px;
-    }
+            .settings-section {
+                padding: 18px;
+                margin-bottom: 18px;
+            }
 
-    /* টোস্ট মেসেজ */
-    #toast {
-        bottom: 100px;
-        padding: 14px 24px;
-        font-size: 0.9rem;
-        border-radius: 40px;
-    }
-}
+            /* টোস্ট মেসেজ */
+            #toast {
+                bottom: 100px;
+                padding: 14px 24px;
+                font-size: 0.9rem;
+                border-radius: 40px;
+            }
+        }
 
-/* ল্যান্ডস্কেপ মোডের জন্য (Redmi Note 15 5G) */
-@media (min-width: 1080px) and (orientation: landscape) {
-    body {
-        padding: 12px 16px;
-    }
+        /* ল্যান্ডস্কেপ মোডের জন্য (Redmi Note 15 5G) */
+        @media (min-width: 1080px) and (orientation: landscape) {
+            body {
+                padding: 12px 16px;
+            }
 
-    #editor-tab.active {
-        display: grid !important;
-        grid-template-columns: 1fr 1.2fr;
-        gap: 16px;
-    }
+            #editor-tab.active {
+                display: grid !important;
+                grid-template-columns: 1fr 1.2fr;
+                gap: 16px;
+            }
 
-    .editor-left-column {
-        gap: 12px;
-    }
+            .editor-left-column {
+                gap: 12px;
+            }
 
-    .editor-right-column {
-        gap: 12px;
-    }
+            .editor-right-column {
+                gap: 12px;
+            }
 
-    #preview {
-        height: 380px;
-    }
+            #preview {
+                height: 380px;
+            }
 
-    .actions-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+            .actions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
 
-    .fab-container {
-        bottom: 16px;
-        right: 16px;
-    }
+            .fab-container {
+                bottom: 16px;
+                right: 16px;
+            }
 
-    #toast {
-        bottom: 80px;
-    }
-}
+            #toast {
+                bottom: 80px;
+            }
+        }
 
-/* 1200px এর উপরে (ডেস্কটপ লেভেল) */
-@media (min-width: 1200px) {
-    .actions-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
+        /* 1200px এর উপরে (ডেস্কটপ লেভেল) */
+        @media (min-width: 1200px) {
+            .actions-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
 
-    #editor-tab.active {
-        gap: 24px;
-    }
-}
+            #editor-tab.active {
+                gap: 24px;
+            }
+        }
 
-/* ======================================== */
-/* টাচ অপটিমাইজেশন (Redmi Note 15 5G)      */
-/* ======================================== */
+        /* ======================================== */
+        /* টাচ অপটিমাইজেশন (Redmi Note 15 5G)      */
+        /* ======================================== */
 
-/* টাচ ফিডব্যাক উন্নত করা */
-@media (hover: none) and (pointer: coarse) {
-    .btn, 
-    .fab, 
-    .fab-action,
-    #alphabetBar span,
-    .settings-btn,
-    #preview div {
-        cursor: pointer;
-        transition: all 0.1s ease;
-    }
+        /* টাচ ফিডব্যাক উন্নত করা */
+        @media (hover: none) and (pointer: coarse) {
 
-    .btn:active {
-        transform: scale(0.96);
-        opacity: 0.8;
-    }
+            .btn,
+            .fab,
+            .fab-action,
+            #alphabetBar span,
+            .settings-btn,
+            #preview div {
+                cursor: pointer;
+                transition: all 0.1s ease;
+            }
 
-    .fab:active {
-        transform: scale(0.92);
-    }
+            .btn:active {
+                transform: scale(0.96);
+                opacity: 0.8;
+            }
 
-    #preview div:active {
-        background: rgba(37, 99, 235, 0.15);
-        transform: scale(0.99);
-    }
+            .fab:active {
+                transform: scale(0.92);
+            }
 
-    #alphabetBar span:active {
-        background: var(--primary);
-        color: white;
-        transform: scale(0.94);
-    }
-}
+            #preview div:active {
+                background: rgba(37, 99, 235, 0.15);
+                transform: scale(0.99);
+            }
 
-/* নোটচ 15 5G নচ/পাঞ্চ হোল এর জন্য সেফ এরিয়া */
-@supports (padding-top: env(safe-area-inset-top)) {
-    body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
+            #alphabetBar span:active {
+                background: var(--primary);
+                color: white;
+                transform: scale(0.94);
+            }
+        }
 
-    .settings-btn {
-        top: max(16px, env(safe-area-inset-top));
-        right: max(16px, env(safe-area-inset-right));
-    }
+        /* নোটচ 15 5G নচ/পাঞ্চ হোল এর জন্য সেফ এরিয়া */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
 
-    .fab-container {
-        bottom: max(20px, env(safe-area-inset-bottom));
-        right: max(20px, env(safe-area-inset-right));
-    }
-}
+            .settings-btn {
+                top: max(16px, env(safe-area-inset-top));
+                right: max(16px, env(safe-area-inset-right));
+            }
 
-/* হাই রিফ্রেশ রেট ডিসপ্লের জন্য অ্যানিমেশন অপটিমাইজ */
-@media (prefers-reduced-motion: no-preference) {
-    * {
-        scroll-behavior: smooth;
-    }
-    
-    .btn, .fab, .fab-action {
-        transition: all 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-}
+            .fab-container {
+                bottom: max(20px, env(safe-area-inset-bottom));
+                right: max(20px, env(safe-area-inset-right));
+            }
+        }
 
-.scrollable-content {
-    will-change: transform;
-    -webkit-overflow-scrolling: touch;
-}
+        /* হাই রিফ্রেশ রেট ডিসপ্লের জন্য অ্যানিমেশন অপটিমাইজ */
+        @media (prefers-reduced-motion: no-preference) {
+            * {
+                scroll-behavior: smooth;
+            }
+
+            .btn,
+            .fab,
+            .fab-action {
+                transition: all 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            }
+        }
+
+        .scrollable-content {
+            will-change: transform;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 
 </head>
@@ -1904,6 +1912,7 @@
                         <button class="btn" onclick="removeExtraSpaces()">✨ Format</button>
                         <button class="btn btn-success" onclick="downloadFile()">📥 TXT</button>
                         <button class="btn btn-success" onclick="downloadZip()">📦 ZIP</button>
+                        <button class="btn btn-success" onclick="exportToPcTxt()">💻 PC TXT</button>
                         <button class="btn btn-warning" onclick="sendToTelegram()">📤 Telegram</button>
                         <button class="btn" onclick="goToLastChange()">🟢 Changed</button>
                     </div>
@@ -2630,6 +2639,81 @@
             textArea.value = [...comments, ...normal].join('\n');
             updatePreview();
             showToast("Lines sorted alphabetically!", 'success');
+        }
+
+        function exportToPcTxt() {
+            const lines = textArea.value.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
+
+            if (lines.length === 0) {
+                showToast("No entries found to export!", 'error');
+                return;
+            }
+
+            // Dictionary object তৈরি করা
+            const dictionaryObj = {};
+
+            lines.forEach(line => {
+                const parts = line.split('\t');
+                if (parts.length >= 2) {
+                    let shortcut = parts[0].trim();
+                    let value = parts[1].trim();
+
+                    // 🔥 value-তে থাকা \44 কে " এ কনভার্ট করা
+                    value = value.replace(/\\44/g, '"');
+
+                    if (shortcut && value) {
+                        dictionaryObj[shortcut] = value;
+                    }
+                }
+            });
+
+            if (Object.keys(dictionaryObj).length === 0) {
+                showToast("No valid entries found!", 'error');
+                return;
+            }
+
+            // এন্ট্রিগুলো শর্টকাট অনুযায়ী সাজানো (A-Z)
+            const sortedEntries = Object.keys(dictionaryObj).sort().map(key => [key, dictionaryObj[key]]);
+
+            // Perfect ইন্ডেন্টেশন সহ ফাইনাল টেক্সট কন্টেন্ট তৈরি (শুধু অবজেক্ট)
+            let pcTextContent = `const defaultDictionary = {\n`;
+
+            // প্রতিটি এন্ট্রি Perfect ইন্ডেন্টেশন সহ ফরম্যাট করা
+            sortedEntries.forEach(([key, value], index) => {
+                const isLast = index === sortedEntries.length - 1;
+                // 4 স্পেস ইন্ডেন্টেশন ব্যবহার করা হয়েছে - Copy-Paste Ready
+                // 🔥 value-তে থাকা ডাবল কোট এসকেপ করা হচ্ছে
+                pcTextContent += `    "${key}": "${value.replace(/"/g, '\\"')}"${isLast ? '' : ','}\n`;
+            });
+
+            pcTextContent += `};`;
+
+            // TXT ফাইল হিসেবে ডাউনলোড করা
+            const blob = new Blob([pcTextContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // টাইমস্ট্যাম্প সহ ফাইলের নাম তৈরি - pc_ prefix এবং .txt এক্সটেনশন
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const day = now.getDate();
+            const month = now.toLocaleString('default', { month: 'long' });
+            const year = now.getFullYear();
+
+            // ফাইলের নাম তৈরি
+            const filename = `pc_dictionary_${formattedHours}_${formattedMinutes}_${ampm}_${day}_${month}_${year}.txt`;
+
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast(`✅ PC Dictionary exported as: ${filename} (Converted \\44 to ")`, 'success');
         }
 
         // ==================== ENTRY MANAGEMENT ====================
