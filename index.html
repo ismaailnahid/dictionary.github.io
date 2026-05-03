@@ -3168,9 +3168,41 @@
                 discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
             });
             gapiInited = true;
+
+            // 🔥 পেজ রিলোডে আগের টোকেন চেক করুন
+            await checkExistingToken();
+
             maybeEnableButtons();
         }
 
+        // নতুন ফাংশন: আগের টোকেন চেক করার জন্য
+        async function checkExistingToken() {
+            const savedToken = localStorage.getItem('gdrive_access_token');
+            const tokenExpiry = localStorage.getItem('gdrive_token_expiry');
+
+            if (savedToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
+                // টোকেন এখনও বৈধ
+                gapi.client.setToken({ access_token: savedToken });
+
+                const statusDiv = document.getElementById('driveStatus');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '✅ Connected to Google Drive (Auto)';
+                    statusDiv.style.color = 'var(--success)';
+                }
+
+                // বাটন এনাবল করুন
+                const saveBtn = document.getElementById('driveSaveBtnLocal');
+                const loadBtn = document.getElementById('driveLoadBtnLocal');
+                if (saveBtn) saveBtn.disabled = false;
+                if (loadBtn) loadBtn.disabled = false;
+
+                await getOrCreateGboardFolder();
+                await listDriveFiles();
+                showToast('Auto-reconnected to Google Drive', 'success');
+                return true;
+            }
+            return false;
+        }
         function gisLoaded() {
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
@@ -3185,6 +3217,14 @@
                         }
                         showToast('Login failed: ' + resp.error, 'error');
                         return;
+                    }
+
+                    // 🔥 টোকেন localStorage-এ সেভ করুন
+                    const accessToken = gapi.client.getToken().access_token;
+                    if (accessToken) {
+                        localStorage.setItem('gdrive_access_token', accessToken);
+                        // টোকেন এক্সপায়ারি টাইম সেট করুন (1 ঘন্টা)
+                        localStorage.setItem('gdrive_token_expiry', (Date.now() + 3600000).toString());
                     }
 
                     const statusDiv = document.getElementById('driveStatus');
@@ -3207,6 +3247,26 @@
             });
             gisInited = true;
             maybeEnableButtons();
+        }
+
+        // লগআউট ফাংশন (যদি চান)
+        function logoutFromDrive() {
+            localStorage.removeItem('gdrive_access_token');
+            localStorage.removeItem('gdrive_token_expiry');
+            if (gapi.client.getToken()) {
+                gapi.client.setToken(null);
+            }
+            const statusDiv = document.getElementById('driveStatus');
+            if (statusDiv) {
+                statusDiv.innerHTML = '🔌 Disconnected. Click Sign in to connect';
+                statusDiv.style.color = '';
+            }
+            const saveBtn = document.getElementById('driveSaveBtnLocal');
+            const loadBtn = document.getElementById('driveLoadBtnLocal');
+            if (saveBtn) saveBtn.disabled = true;
+            if (loadBtn) loadBtn.disabled = true;
+            document.getElementById('driveFileListArea').innerHTML = '';
+            showToast('Disconnected from Google Drive', 'info');
         }
 
         function maybeEnableButtons() {
@@ -3399,8 +3459,6 @@
         function setupDriveUI() {
             const container = document.querySelector('.editor-left-column');
             if (!container) return;
-
-            // Check if already added
             if (document.getElementById('driveCard')) return;
 
             const driveCard = document.createElement('div');
@@ -3408,7 +3466,10 @@
             driveCard.id = 'driveCard';
             driveCard.innerHTML = `
         <h3>☁️ Google Drive Sync</h3>
-        <button id="gdriveSignInBtn" class="btn" style="width:100%; margin-bottom:10px;" disabled>🔐 Sign in to Google Drive</button>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <button id="gdriveSignInBtn" class="btn" style="flex:2;" disabled>🔐 Sign in</button>
+            <button id="gdriveLogoutBtn" class="btn btn-secondary" style="flex:1;">🚪 Logout</button>
+        </div>
         <div id="driveStatus" style="padding:8px; border-radius:8px; background:var(--bg); margin-bottom:10px; text-align:center; font-size:12px;">
             ⏳ Click Sign in to connect
         </div>
@@ -3421,8 +3482,8 @@
 
             container.insertBefore(driveCard, container.children[1]);
 
-            // Attach events
             document.getElementById('gdriveSignInBtn').onclick = handleAuthClick;
+            document.getElementById('gdriveLogoutBtn').onclick = logoutFromDrive;
             document.getElementById('driveSaveBtnLocal').onclick = saveToDrive;
             document.getElementById('driveLoadBtnLocal').onclick = showDriveFiles;
         }
@@ -3451,6 +3512,7 @@
         // loadGoogleApis();
 
         // ==================== INITIALIZATION ====================
+        // আপনার init() ফাংশনের ভিতরে এই লাইনগুলো ঠিক করুন:
         function init() {
             updatePreview();
             initAlphabetBar();
@@ -3458,12 +3520,10 @@
             initExactMatchToggle();
             setupAutoValueFill();
             setupDriveUI();
-            loadGoogleApis();
+            loadGoogleApis();  // এটা আগে কল করুন
 
-            // সেকশনের স্টেট লোড করো
             loadSectionStates();
 
-            // Load Telegram settings if exists
             const savedToken = localStorage.getItem('telegramBotToken');
             const savedChatId = localStorage.getItem('telegramChatId');
             if (savedToken) document.getElementById('botToken').value = savedToken;
