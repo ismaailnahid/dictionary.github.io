@@ -3137,11 +3137,11 @@
 
 
 
-        // ==================== GOOGLE DRIVE INTEGRATION ====================
+        // ==================== GOOGLE DRIVE INTEGRATION (GitHub Pages Ready) ====================
 
-        // Google API Configuration
-        const CLIENT_ID = '1051745042860-h2n83c5m857p64ckivuiqlp5t35vhkc0.apps.googleusercontent.com'; // আপনার Client ID দিন
-        const API_KEY = 'AIzaSyBlI7FwdSxj2mcQuDA8c9zHlvR9y3aR84Y'; // আপনার API Key দিন
+        // আপনার নিজের credentials দিন
+        const CLIENT_ID = '1051745042860-h2n83c5m857p64ckivuiqlp5t35vhkc0.apps.googleusercontent.com'; // ⚠️ পরিবর্তন করুন
+        const API_KEY = 'AIzaSyBlI7FwdSxj2mcQuDA8c9zHlvR9y3aR84Y'; // ⚠️ পরিবর্তন করুন
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
         const FOLDER_NAME = 'Gboard Dictionary';
 
@@ -3149,81 +3149,19 @@
         let gisInited = false;
         let tokenClient = null;
 
-        // DOM Elements for Drive
-        const driveStatus = document.createElement('div');
-        const driveFileList = document.createElement('div');
-        const driveSaveBtn = document.createElement('button');
-        const driveLoadBtn = document.createElement('button');
-        const driveFileSelect = document.createElement('select');
-
-        // Setup Drive UI Elements
-        function setupDriveUI() {
-            // Drive Status
-            driveStatus.id = 'driveStatus';
-            driveStatus.className = 'drive-status';
-            driveStatus.innerHTML = '🔌 Connecting to Google Drive...';
-
-            // File List Container
-            driveFileList.id = 'driveFileList';
-            driveFileList.className = 'drive-file-list';
-            driveFileList.innerHTML = '<div style="text-align:center; padding:20px;">Login to see files</div>';
-
-            // Save Button
-            driveSaveBtn.id = 'driveSaveBtn';
-            driveSaveBtn.className = 'btn btn-success';
-            driveSaveBtn.innerHTML = '☁️ Save to Drive';
-            driveSaveBtn.onclick = saveToDrive;
-            driveSaveBtn.disabled = true;
-
-            // Load Button
-            driveLoadBtn.id = 'driveLoadBtn';
-            driveLoadBtn.className = 'btn btn-primary';
-            driveLoadBtn.innerHTML = '📂 Load from Drive';
-            driveLoadBtn.onclick = () => driveFileSelect.style.display = 'block';
-            driveLoadBtn.disabled = true;
-
-            // File Select
-            driveFileSelect.id = 'driveFileSelect';
-            driveFileSelect.style.display = 'none';
-            driveFileSelect.style.margin = '10px 0';
-            driveFileSelect.style.padding = '8px';
-            driveFileSelect.innerHTML = '<option>Select a file...</option>';
-            driveFileSelect.onchange = loadSelectedFile;
-
-            // Add to DOM - আপনার পছন্দমতো জায়গায় যোগ করুন
-            const container = document.querySelector('.editor-left-column');
-            const driveCard = document.createElement('div');
-            driveCard.className = 'card';
-            driveCard.id = 'driveCard';
-            driveCard.innerHTML = `
-        <h3>☁️ Google Drive Sync</h3>
-        <button id="gdriveSignInBtn" class="btn" style="width:100%; margin-bottom:10px;">🔐 Sign in to Google Drive</button>
-        <div id="driveStatusArea"></div>
-        <div class="drive-actions" style="display:flex; gap:10px; margin:10px 0;">
-            <button id="driveSaveBtnLocal" class="btn btn-success" style="flex:1;">💾 Save to Drive</button>
-            <button id="driveLoadBtnLocal" class="btn btn-primary" style="flex:1;">📂 Load from Drive</button>
-        </div>
-        <div id="driveFileSelectArea"></div>
-        <div id="driveFileListArea"></div>
-    `;
-
-            container.insertBefore(driveCard, container.children[1]);
-
-            // Re-attach buttons after DOM insertion
-            document.getElementById('driveSaveBtnLocal').onclick = saveToDrive;
-            document.getElementById('driveLoadBtnLocal').onclick = showDriveFiles;
-            document.getElementById('gdriveSignInBtn').onclick = handleAuthClick;
-
-            document.getElementById('driveStatusArea').appendChild(driveStatus);
-            document.getElementById('driveFileSelectArea').appendChild(driveFileSelect);
-            document.getElementById('driveFileListArea').appendChild(driveFileList);
+        // আপনার সাইটের জন্য সঠিক URL জেনারেট করা
+        function getBaseUrl() {
+            if (window.location.hostname === 'ismaailnahid.github.io') {
+                return 'https://ismaailnahid.github.io/gboard_dictionary.github.io';
+            }
+            return window.location.origin;
         }
 
-        // Initialize Google API
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
+        function getRedirectUri() {
+            return getBaseUrl() + '/';
         }
 
+        // Google API ইনিশিয়ালাইজ
         async function initializeGapiClient() {
             await gapi.client.init({
                 apiKey: API_KEY,
@@ -3237,43 +3175,58 @@
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPES,
-                callback: '', // defined later
+                callback: async (resp) => {
+                    if (resp.error !== undefined) {
+                        console.error('Auth Error:', resp);
+                        const statusDiv = document.getElementById('driveStatus');
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '❌ Login failed: ' + resp.error;
+                            statusDiv.style.color = 'var(--danger)';
+                        }
+                        showToast('Login failed: ' + resp.error, 'error');
+                        return;
+                    }
+
+                    const statusDiv = document.getElementById('driveStatus');
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '✅ Connected to Google Drive';
+                        statusDiv.style.color = 'var(--success)';
+                    }
+
+                    // Enable buttons
+                    const saveBtn = document.getElementById('driveSaveBtnLocal');
+                    const loadBtn = document.getElementById('driveLoadBtnLocal');
+                    if (saveBtn) saveBtn.disabled = false;
+                    if (loadBtn) loadBtn.disabled = false;
+
+                    await getOrCreateGboardFolder();
+                    await listDriveFiles();
+                    showToast('Connected to Google Drive successfully!', 'success');
+                },
+                redirect_uri: getRedirectUri()
             });
             gisInited = true;
             maybeEnableButtons();
         }
 
         function maybeEnableButtons() {
-            if (gapiInited && gisInited) {
-                const signInBtn = document.getElementById('gdriveSignInBtn');
-                if (signInBtn) signInBtn.disabled = false;
+            const signInBtn = document.getElementById('gdriveSignInBtn');
+            if (signInBtn && gapiInited && gisInited) {
+                signInBtn.disabled = false;
             }
         }
 
         function handleAuthClick() {
-            tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    throw (resp);
-                }
-                driveStatus.innerHTML = '✅ Connected to Google Drive';
-                driveStatus.style.color = 'var(--success)';
-                document.getElementById('driveSaveBtnLocal').disabled = false;
-                document.getElementById('driveLoadBtnLocal').disabled = false;
-                await getOrCreateGboardFolder();
-                await listDriveFiles();
-            };
-
-            if (gapi.client.getToken() === null) {
+            if (tokenClient) {
                 tokenClient.requestAccessToken({ prompt: 'consent' });
             } else {
-                tokenClient.requestAccessToken({ prompt: '' });
+                showToast('Please wait, loading...', 'info');
             }
         }
 
         // Get or Create "Gboard Dictionary" folder
         async function getOrCreateGboardFolder() {
             try {
-                // Search for existing folder
                 const response = await gapi.client.drive.files.list({
                     q: `name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
                     fields: 'files(id, name)'
@@ -3283,9 +3236,11 @@
 
                 if (response.result.files.length > 0) {
                     folderId = response.result.files[0].id;
-                    driveStatus.innerHTML = `✅ Connected to Drive - Folder: ${FOLDER_NAME}`;
+                    const statusDiv = document.getElementById('driveStatus');
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `✅ Connected - Folder: ${FOLDER_NAME}`;
+                    }
                 } else {
-                    // Create folder if doesn't exist
                     const fileMetadata = {
                         name: FOLDER_NAME,
                         mimeType: 'application/vnd.google-apps.folder'
@@ -3295,36 +3250,44 @@
                         fields: 'id'
                     });
                     folderId = createResponse.result.id;
-                    driveStatus.innerHTML = `✅ Created "${FOLDER_NAME}" folder in Google Drive`;
+                    const statusDiv = document.getElementById('driveStatus');
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `✅ Created "${FOLDER_NAME}" folder`;
+                    }
                 }
 
                 localStorage.setItem('gdriveFolderId', folderId);
                 return folderId;
             } catch (error) {
-                console.error('Error creating/finding folder:', error);
-                driveStatus.innerHTML = '❌ Error accessing Google Drive';
+                console.error('Error:', error);
+                const statusDiv = document.getElementById('driveStatus');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '❌ Error accessing Drive';
+                    statusDiv.style.color = 'var(--danger)';
+                }
                 return null;
             }
         }
 
-        // Save current dictionary to Drive
+        // Save to Drive
         async function saveToDrive() {
             if (!textArea.value.trim()) {
                 showToast('No content to save!', 'error');
                 return;
             }
 
-            const timestamp = new Date();
-            const filename = `gboard_dict_${timestamp.getFullYear()}-${timestamp.getMonth() + 1}-${timestamp.getDate()}_${timestamp.getHours()}-${timestamp.getMinutes()}-${timestamp.getSeconds()}.txt`;
+            const now = new Date();
+            const filename = `gboard_dict_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}.txt`;
 
             const folderId = localStorage.getItem('gdriveFolderId');
             if (!folderId) {
-                showToast('Folder not found!', 'error');
+                showToast('Folder not found! Please reconnect.', 'error');
                 return;
             }
 
             try {
-                driveStatus.innerHTML = '💾 Saving to Drive...';
+                const statusDiv = document.getElementById('driveStatus');
+                if (statusDiv) statusDiv.innerHTML = '💾 Saving to Drive...';
 
                 const metadata = {
                     name: filename,
@@ -3344,20 +3307,21 @@
                 });
 
                 if (response.ok) {
-                    driveStatus.innerHTML = `✅ Saved: ${filename}`;
-                    showToast(`✅ Dictionary saved to Drive as ${filename}`, 'success');
-                    await listDriveFiles(); // Refresh file list
+                    if (statusDiv) statusDiv.innerHTML = `✅ Saved: ${filename}`;
+                    showToast(`✅ Saved to Drive as ${filename}`, 'success');
+                    await listDriveFiles();
                 } else {
                     throw new Error('Upload failed');
                 }
             } catch (error) {
-                console.error('Error saving to Drive:', error);
-                driveStatus.innerHTML = '❌ Save failed!';
-                showToast('Failed to save to Google Drive', 'error');
+                console.error('Save error:', error);
+                const statusDiv = document.getElementById('driveStatus');
+                if (statusDiv) statusDiv.innerHTML = '❌ Save failed!';
+                showToast('Failed to save to Drive', 'error');
             }
         }
 
-        // List all files from Gboard Dictionary folder
+        // List files from Drive
         async function listDriveFiles() {
             const folderId = localStorage.getItem('gdriveFolderId');
             if (!folderId) return;
@@ -3370,21 +3334,22 @@
                 });
 
                 const files = response.result.files;
+                const fileListDiv = document.getElementById('driveFileListArea');
+
+                if (!fileListDiv) return;
 
                 if (files.length === 0) {
-                    driveFileList.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-muted);">📭 No files found. Create one by saving!</div>';
-                    driveFileSelect.innerHTML = '<option>No files available</option>';
+                    fileListDiv.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-muted);">📭 No files yet. Save one!</div>';
                     return;
                 }
 
-                // Create file list HTML
-                let fileListHTML = '<div style="max-height:200px; overflow-y:auto;">';
+                let html = '<div style="max-height:200px; overflow-y:auto;">';
                 files.forEach(file => {
                     const date = new Date(file.modifiedTime);
                     const sizeKB = (file.size / 1024).toFixed(1);
-                    fileListHTML += `
-                <div class="drive-file-item" style="padding:8px; border-bottom:1px solid var(--border); cursor:pointer;" 
-                     onclick="loadSpecificFile('${file.id}', '${file.name.replace(/'/g, "\\'")}')">
+                    html += `
+                <div class="drive-file-item" style="padding:8px; border-bottom:1px solid var(--border); cursor:pointer; border-radius:6px; margin:4px 0;" 
+                     onclick="loadSpecificFile('${file.id}', '${escapeHtml(file.name)}')">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight:600;">📄 ${escapeHtml(file.name)}</span>
                         <span style="font-size:11px; color:var(--text-muted);">${sizeKB}KB</span>
@@ -3395,35 +3360,19 @@
                 </div>
             `;
                 });
-                fileListHTML += '</div>';
-                driveFileList.innerHTML = fileListHTML;
-
-                // Update select dropdown
-                driveFileSelect.innerHTML = '<option value="">📁 Select a file to load...</option>';
-                files.forEach(file => {
-                    driveFileSelect.innerHTML += `<option value="${file.id}">${escapeHtml(file.name)}</option>`;
-                });
-
-                driveFileList.style.display = 'block';
+                html += '</div>';
+                fileListDiv.innerHTML = html;
 
             } catch (error) {
-                console.error('Error listing files:', error);
-                driveFileList.innerHTML = '<div style="text-align:center; padding:10px; color:var(--danger);">❌ Failed to load files</div>';
+                console.error('List error:', error);
             }
         }
 
-        // Show Drive files (when Load button clicked)
-        async function showDriveFiles() {
-            await listDriveFiles();
-            driveFileSelect.style.display = 'block';
-            driveFileList.style.display = 'block';
-            showToast('📁 Click on any file to load it', 'info');
-        }
-
-        // Load specific file from Drive
+        // Load specific file
         async function loadSpecificFile(fileId, fileName) {
             try {
-                driveStatus.innerHTML = `📥 Loading ${fileName}...`;
+                const statusDiv = document.getElementById('driveStatus');
+                if (statusDiv) statusDiv.innerHTML = `📥 Loading ${fileName}...`;
 
                 const response = await gapi.client.drive.files.get({
                     fileId: fileId,
@@ -3433,90 +3382,54 @@
                 textArea.value = response.body;
                 updatePreview();
 
-                driveStatus.innerHTML = `✅ Loaded: ${fileName}`;
-                showToast(`✅ Loaded "${fileName}" successfully!`, 'success');
-
-                // Close select after load
-                driveFileSelect.style.display = 'none';
-
-                // Add to recent files
-                addToRecentFiles(fileId, fileName);
+                if (statusDiv) statusDiv.innerHTML = `✅ Loaded: ${fileName}`;
+                showToast(`✅ Loaded "${fileName}"`, 'success');
 
             } catch (error) {
-                console.error('Error loading file:', error);
-                driveStatus.innerHTML = '❌ Failed to load file';
-                showToast('Failed to load file from Drive', 'error');
+                console.error('Load error:', error);
+                showToast('Failed to load file', 'error');
             }
         }
 
-        // Load selected file from dropdown
-        function loadSelectedFile() {
-            const selectedOption = driveFileSelect.options[driveFileSelect.selectedIndex];
-            if (selectedOption && selectedOption.value) {
-                loadSpecificFile(selectedOption.value, selectedOption.text);
-            }
+        async function showDriveFiles() {
+            await listDriveFiles();
         }
 
-        // Recent files tracking
-        function addToRecentFiles(fileId, fileName) {
-            let recentFiles = JSON.parse(localStorage.getItem('recentDriveFiles') || '[]');
-            recentFiles = recentFiles.filter(f => f.id !== fileId);
-            recentFiles.unshift({ id: fileId, name: fileName, timestamp: Date.now() });
-            recentFiles = recentFiles.slice(0, 10); // Keep last 10
-            localStorage.setItem('recentDriveFiles', JSON.stringify(recentFiles));
-        }
+        // Setup Drive UI
+        function setupDriveUI() {
+            const container = document.querySelector('.editor-left-column');
+            if (!container) return;
 
-        // Auto-save to Drive (optional feature)
-        let autoDriveSaveInterval = null;
+            // Check if already added
+            if (document.getElementById('driveCard')) return;
 
-        function enableAutoDriveSave(minutes = 5) {
-            if (autoDriveSaveInterval) clearInterval(autoDriveSaveInterval);
+            const driveCard = document.createElement('div');
+            driveCard.className = 'card';
+            driveCard.id = 'driveCard';
+            driveCard.innerHTML = `
+        <h3>☁️ Google Drive Sync</h3>
+        <button id="gdriveSignInBtn" class="btn" style="width:100%; margin-bottom:10px;" disabled>🔐 Sign in to Google Drive</button>
+        <div id="driveStatus" style="padding:8px; border-radius:8px; background:var(--bg); margin-bottom:10px; text-align:center; font-size:12px;">
+            ⏳ Click Sign in to connect
+        </div>
+        <div class="drive-actions" style="display:flex; gap:10px; margin:10px 0;">
+            <button id="driveSaveBtnLocal" class="btn btn-success" style="flex:1;" disabled>💾 Save to Drive</button>
+            <button id="driveLoadBtnLocal" class="btn btn-primary" style="flex:1;" disabled>📂 Load from Drive</button>
+        </div>
+        <div id="driveFileListArea" style="max-height:250px; overflow-y:auto; margin-top:10px;"></div>
+    `;
 
-            autoDriveSaveInterval = setInterval(async () => {
-                if (gapi.client.getToken() && textArea.value.trim()) {
-                    const autoSaveFilename = `auto_save_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
-                    await saveToDriveWithName(autoSaveFilename);
-                    showToast('🔄 Auto-saved to Drive', 'info');
-                }
-            }, minutes * 60 * 1000);
-        }
+            container.insertBefore(driveCard, container.children[1]);
 
-        async function saveToDriveWithName(filename) {
-            const folderId = localStorage.getItem('gdriveFolderId');
-            if (!folderId) return;
-
-            try {
-                const metadata = {
-                    name: filename,
-                    parents: [folderId],
-                    mimeType: 'text/plain'
-                };
-
-                const form = new FormData();
-                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                form.append('file', new Blob([textArea.value], { type: 'text/plain' }));
-
-                const accessToken = gapi.client.getToken().access_token;
-                await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-                    body: form
-                });
-            } catch (error) {
-                console.error('Auto-save failed:', error);
-            }
-        }
-
-        // Escape HTML for safe display
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            // Attach events
+            document.getElementById('gdriveSignInBtn').onclick = handleAuthClick;
+            document.getElementById('driveSaveBtnLocal').onclick = saveToDrive;
+            document.getElementById('driveLoadBtnLocal').onclick = showDriveFiles;
         }
 
         // Load Google APIs
         function loadGoogleApis() {
-            // Load Google API Client
+            // Load GAPI
             const gapiScript = document.createElement('script');
             gapiScript.src = 'https://apis.google.com/js/api.js';
             gapiScript.onload = () => {
@@ -3524,7 +3437,7 @@
             };
             document.head.appendChild(gapiScript);
 
-            // Load Google Identity Services
+            // Load GIS
             const gisScript = document.createElement('script');
             gisScript.src = 'https://accounts.google.com/gsi/client';
             gisScript.onload = () => {
@@ -3533,8 +3446,7 @@
             document.head.appendChild(gisScript);
         }
 
-        // Call this after your existing init() function
-        // Add at the end of your script:
+        // Call this in your init() function
         // setupDriveUI();
         // loadGoogleApis();
 
